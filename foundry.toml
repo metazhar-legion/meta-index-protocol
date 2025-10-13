@@ -2,5 +2,29 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+solc_version = "0.8.24"
+optimizer = true
+optimizer_runs = 1000000
+via_ir = false
+
+# Testing
+verbosity = 3
+fuzz_runs = 1000
+ffi = false
+
+# Formatting
+line_length = 100
+tab_width = 4
+bracket_spacing = false
+
+# RPC URLs
+[rpc_endpoints]
+arbitrum_sepolia = "${ARBITRUM_SEPOLIA_RPC}"
+arbitrum_mainnet = "${ARBITRUM_MAINNET_RPC}"
+
+# Etherscan
+[etherscan]
+arbitrum_sepolia = { key = "${ARBISCAN_API_KEY}" }
+arbitrum = { key = "${ARBISCAN_API_KEY}" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
