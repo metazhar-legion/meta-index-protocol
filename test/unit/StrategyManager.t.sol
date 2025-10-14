@@ -34,7 +34,7 @@ contract StrategyManagerTest is Test {
 
     // ============ CONSTRUCTOR TESTS ============
 
-    function test_constructor_success() public {
+    function test_constructor_success() public view {
         assertEq(manager.vault(), vault);
         assertEq(manager.asset(), address(usdc));
         assertTrue(manager.hasRole(manager.DEFAULT_ADMIN_ROLE(), admin));
@@ -295,7 +295,7 @@ contract StrategyManagerTest is Test {
         assertEq(manager.totalValue(), 1500e6);
     }
 
-    function test_totalValue_empty() public {
+    function test_totalValue_empty() public view {
         assertEq(manager.totalValue(), 0);
     }
 

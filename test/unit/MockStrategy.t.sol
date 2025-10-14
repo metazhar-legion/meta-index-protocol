@@ -26,7 +26,7 @@ contract MockStrategyTest is Test {
 
     // ============ CONSTRUCTOR TESTS ============
 
-    function test_constructor_success() public {
+    function test_constructor_success() public view {
         assertEq(strategy.vault(), vault);
         assertEq(strategy.strategyManager(), manager);
         assertEq(strategy.asset(), address(usdc));
@@ -178,11 +178,11 @@ contract MockStrategyTest is Test {
 
     // ============ VIEW FUNCTIONS ============
 
-    function test_name() public {
+    function test_name() public view {
         assertEq(strategy.name(), "Mock Strategy");
     }
 
-    function test_totalValue_empty() public {
+    function test_totalValue_empty() public view {
         assertEq(strategy.totalValue(), 0);
     }
 

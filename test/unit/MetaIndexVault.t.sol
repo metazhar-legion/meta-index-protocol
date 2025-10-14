@@ -112,7 +112,7 @@ contract MetaIndexVaultTest is Test {
 
     // ============ SHARES/ASSETS CONVERSION ============
 
-    function test_convertToShares_initialDeposit() public {
+    function test_convertToShares_initialDeposit() public view {
         uint256 assets = 1000e6;
         uint256 shares = vault.convertToShares(assets);
 
