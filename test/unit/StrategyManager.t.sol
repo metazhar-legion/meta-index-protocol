@@ -23,7 +23,7 @@ contract StrategyManagerTest is Test {
         admin = address(this);
 
         usdc = new MockERC20("USDC", "USDC", 6);
-        manager = new StrategyManager(vault, address(usdc));
+        manager = new StrategyManager(vault, address(usdc), address(0));
 
         strategy1 = new MockStrategy(vault, address(manager), address(usdc));
         strategy2 = new MockStrategy(vault, address(manager), address(usdc));

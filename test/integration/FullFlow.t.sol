@@ -38,7 +38,7 @@ contract FullFlowTest is Test {
         );
 
         // Deploy StrategyManager
-        manager = new StrategyManager(address(vault), address(usdc));
+        manager = new StrategyManager(address(vault), address(usdc), address(0));
 
         // Deploy Strategy
         strategy = new MockStrategy(
