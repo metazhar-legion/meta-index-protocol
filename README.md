@@ -6,18 +6,22 @@
 
 Meta Index Protocol enables users to gain diversified exposure to crypto, DeFi, and tokenized real-world assets through automated, rules-based index strategies.
 
-**Phase 1A Status:** COMPLETED - Core vault infrastructure deployed
+**Phase 1A Status:** ✅ COMPLETED - Core vault infrastructure deployed
+
+**Phase 1B Status:** ✅ COMPLETED - Strategy system implemented
 
 **Current Deployment:** Local development
 
 ## Architecture
 
 ```
-MetaIndexVault (ERC-4626)
+MetaIndexVault (ERC-4626) ✅
     ↓
- StrategyManager (Coming in Phase 1B)
+StrategyManager ✅
     ↓
-Strategies (Crypto, DeFi, RWA, Yield)
+Strategies (BaseStrategy, MockStrategy) ✅
+    ↓
+Future: Crypto, DeFi, RWA, Yield Strategies
 ```
 
 ## Quick Start
@@ -71,14 +75,27 @@ make gas-report
 - TVL caps for phased rollout
 - Comprehensive test suite (21 tests, all passing)
 
+## Phase 1B Implementation (COMPLETED)
+
+### Implemented Features
+
+- Strategy system interfaces (src/interfaces/IStrategy.sol:1, src/interfaces/IStrategyManager.sol:1)
+- BaseStrategy abstract contract (src/strategies/BaseStrategy.sol:1)
+- MockStrategy for testing (src/strategies/MockStrategy.sol:1)
+- StrategyManager orchestration layer (src/StrategyManager.sol:1)
+- Strategy allocation and deallocation
+- Multi-strategy support with percentage allocations
+- Integration tests for full vault → manager → strategy flow
+
 ### Test Results
 
 ```
-21 tests passed | 0 failed | 0 skipped
-- Unit tests: 19 passed
-- Fuzz tests: 2 passed (256 runs each)
-- Multi-user tests: included
-- Event emission tests: included
+91 tests passed | 0 failed | 0 skipped
+- Phase 1A (Vault): 21 tests passed
+- Phase 1B (Strategy): 26 tests passed
+- Phase 1B (Manager): 33 tests passed
+- Integration tests: 11 tests passed
+- Fuzz tests: 3 passed (256 runs each)
 ```
 
 ### Gas Benchmarks (Phase 1A)
@@ -94,17 +111,25 @@ make gas-report
 ```
 src/
 ├── MetaIndexVault.sol          # Main vault (ERC-4626) ✅
+├── StrategyManager.sol         # Strategy orchestration ✅
+├── interfaces/
+│   ├── IStrategy.sol           # Strategy interface ✅
+│   └── IStrategyManager.sol    # Manager interface ✅
+├── strategies/
+│   ├── BaseStrategy.sol        # Strategy base class ✅
+│   └── MockStrategy.sol        # Testing strategy ✅
 ├── mocks/
 │   └── MockERC20.sol           # Testing token ✅
-├── strategies/                 # Coming in Phase 1B
 ├── oracle/                     # Coming in Phase 1C
-├── interfaces/                 # Coming in Phase 1B
 └── libraries/                  # Coming in Phase 1D
 
 test/
 ├── unit/
-│   └── MetaIndexVault.t.sol   # Vault tests ✅
-├── integration/                # Coming in Phase 1B
+│   ├── MetaIndexVault.t.sol   # Vault tests ✅
+│   ├── MockStrategy.t.sol     # Strategy tests ✅
+│   └── StrategyManager.t.sol  # Manager tests ✅
+├── integration/
+│   └── FullFlow.t.sol         # End-to-end tests ✅
 ├── fork/                       # Coming in Phase 1E
 └── helpers/
     └── TestHelpers.sol         # Test utilities ✅
@@ -132,13 +157,13 @@ make gas-report
 make clean
 ```
 
-## Next Steps - Phase 1B (Week 2-3)
+## Next Steps - Phase 1C (Week 3-4)
 
-- [ ] Strategy system interfaces
-- [ ] BaseStrategy implementation
-- [ ] MockStrategy for testing
-- [ ] StrategyManager contract
-- [ ] Integration with vault
+- [ ] Price oracle system (IPriceOracle interface)
+- [ ] Chainlink adapter for real-time pricing
+- [ ] Mock price feeds for testing
+- [ ] Price validation and staleness checks
+- [ ] Integration with StrategyManager for TVL calculations
 
 ## Security
 
