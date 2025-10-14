@@ -43,12 +43,12 @@ contract StrategyManagerTest is Test {
 
     function test_constructor_revertsZeroVault() public {
         vm.expectRevert(IStrategyManager.InvalidStrategy.selector);
-        new StrategyManager(address(0), address(usdc));
+        new StrategyManager(address(0), address(usdc), address(0));
     }
 
     function test_constructor_revertsZeroAsset() public {
         vm.expectRevert(IStrategyManager.InvalidStrategy.selector);
-        new StrategyManager(vault, address(0));
+        new StrategyManager(vault, address(0), address(0));
     }
 
     // ============ ADD STRATEGY TESTS ============
