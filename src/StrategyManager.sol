@@ -7,6 +7,7 @@ import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 import {IStrategy} from "./interfaces/IStrategy.sol";
+import {IPriceOracle} from "./interfaces/IPriceOracle.sol";
 
 /**
  * @title StrategyManager
@@ -22,6 +23,7 @@ contract StrategyManager is IStrategyManager, AccessControl, ReentrancyGuard {
 
     address public immutable vault;
     address public immutable asset;
+    address public priceOracle; // Optional - can be zero for single-asset vaults
 
     // Strategy tracking
     address[] private strategies;
@@ -33,12 +35,13 @@ contract StrategyManager is IStrategyManager, AccessControl, ReentrancyGuard {
 
     // ============ CONSTRUCTOR ============
 
-    constructor(address _vault, address _asset) {
+    constructor(address _vault, address _asset, address _priceOracle) {
         if (_vault == address(0)) revert InvalidStrategy();
         if (_asset == address(0)) revert InvalidStrategy();
 
         vault = _vault;
         asset = _asset;
+        priceOracle = _priceOracle; // Can be zero for single-asset vaults
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MANAGER_ROLE, _vault); // Vault can manage strategies
@@ -229,6 +232,27 @@ contract StrategyManager is IStrategyManager, AccessControl, ReentrancyGuard {
      */
     function getStrategyCount() external view returns (uint256) {
         return strategies.length;
+    }
+
+    /**
+     * @notice Get total value in USD (if oracle is set)
+     * @return Total USD value with 8 decimals, or 0 if no oracle
+     */
+    function totalValueUSD() external view returns (uint256) {
+        if (priceOracle == address(0)) return 0;
+
+        uint256 totalAssets = this.totalValue();
+        if (totalAssets == 0) return 0;
+
+        return IPriceOracle(priceOracle).getValue(asset, totalAssets);
+    }
+
+    /**
+     * @notice Set price oracle (admin only)
+     * @param _priceOracle Address of price oracle (can be zero to disable)
+     */
+    function setPriceOracle(address _priceOracle) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        priceOracle = _priceOracle;
     }
 
     // ============ INTERNAL FUNCTIONS ============
