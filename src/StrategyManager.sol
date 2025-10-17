@@ -8,6 +8,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 import {IStrategy} from "./interfaces/IStrategy.sol";
 import {IPriceOracle} from "./interfaces/IPriceOracle.sol";
+import {RebalanceLib} from "./libraries/RebalanceLib.sol";
 
 /**
  * @title StrategyManager
@@ -33,6 +34,11 @@ contract StrategyManager is IStrategyManager, AccessControl, ReentrancyGuard {
 
     uint256 private constant MAX_BPS = 10_000; // 100%
 
+    // Rebalancing parameters
+    uint256 public deviationThreshold; // Deviation threshold in BPS (e.g., 500 = 5%)
+    uint256 public minRebalanceAmount; // Minimum amount to trigger rebalance
+    uint256 public lastRebalanceTimestamp;
+
     // ============ CONSTRUCTOR ============
 
     constructor(address _vault, address _asset, address _priceOracle) {
@@ -42,6 +48,11 @@ contract StrategyManager is IStrategyManager, AccessControl, ReentrancyGuard {
         vault = _vault;
         asset = _asset;
         priceOracle = _priceOracle; // Can be zero for single-asset vaults
+
+        // Initialize rebalancing parameters
+        deviationThreshold = 500; // 5% default
+        minRebalanceAmount = 100e6; // $100 minimum (assuming 6 decimals)
+        lastRebalanceTimestamp = block.timestamp;
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MANAGER_ROLE, _vault); // Vault can manage strategies
@@ -268,4 +279,165 @@ contract StrategyManager is IStrategyManager, AccessControl, ReentrancyGuard {
         }
         return total;
     }
+
+    // ============ REBALANCING FUNCTIONS ============
+
+    /**
+     * @notice Check if portfolio needs rebalancing
+     * @return needsRebalance True if rebalancing is needed
+     */
+    function needsRebalancing() public view returns (bool) {
+        if (strategies.length == 0) return false;
+
+        uint256 totalPortfolioValue = this.totalValue();
+        if (totalPortfolioValue == 0) return false;
+
+        // Get current values for all strategies
+        uint256[] memory strategyValues = new uint256[](strategies.length);
+        uint256[] memory targetAllocations = new uint256[](strategies.length);
+
+        for (uint256 i = 0; i < strategies.length; i++) {
+            strategyValues[i] = IStrategy(strategies[i]).totalValue();
+            targetAllocations[i] = strategyAllocations[strategies[i]];
+        }
+
+        // Calculate allocation states
+        RebalanceLib.AllocationState[] memory states = RebalanceLib.calculateAllocationStates(
+            strategies,
+            targetAllocations,
+            strategyValues,
+            totalPortfolioValue
+        );
+
+        // Check if rebalancing is needed
+        return RebalanceLib.needsRebalancing(states, deviationThreshold);
+    }
+
+    /**
+     * @notice Get current allocation states for all strategies
+     * @return states Array of allocation states
+     */
+    function getAllocationStates()
+        external
+        view
+        returns (RebalanceLib.AllocationState[] memory states)
+    {
+        if (strategies.length == 0) {
+            return new RebalanceLib.AllocationState[](0);
+        }
+
+        uint256 totalPortfolioValue = this.totalValue();
+        if (totalPortfolioValue == 0) {
+            return new RebalanceLib.AllocationState[](0);
+        }
+
+        uint256[] memory strategyValues = new uint256[](strategies.length);
+        uint256[] memory targetAllocations = new uint256[](strategies.length);
+
+        for (uint256 i = 0; i < strategies.length; i++) {
+            strategyValues[i] = IStrategy(strategies[i]).totalValue();
+            targetAllocations[i] = strategyAllocations[strategies[i]];
+        }
+
+        return RebalanceLib.calculateAllocationStates(
+            strategies,
+            targetAllocations,
+            strategyValues,
+            totalPortfolioValue
+        );
+    }
+
+    /**
+     * @notice Execute portfolio rebalancing
+     * @dev Withdraws from overweight strategies and deposits to underweight strategies
+     */
+    function rebalance() external onlyRole(MANAGER_ROLE) nonReentrant {
+        require(strategies.length > 0, "No strategies");
+
+        uint256 totalPortfolioValue = this.totalValue();
+        require(totalPortfolioValue >= minRebalanceAmount, "Below minimum");
+
+        // Get current values
+        uint256[] memory strategyValues = new uint256[](strategies.length);
+        uint256[] memory targetAllocations = new uint256[](strategies.length);
+
+        for (uint256 i = 0; i < strategies.length; i++) {
+            strategyValues[i] = IStrategy(strategies[i]).totalValue();
+            targetAllocations[i] = strategyAllocations[strategies[i]];
+        }
+
+        // Calculate what needs to be done
+        RebalanceLib.AllocationState[] memory states = RebalanceLib.calculateAllocationStates(
+            strategies,
+            targetAllocations,
+            strategyValues,
+            totalPortfolioValue
+        );
+
+        require(
+            RebalanceLib.needsRebalancing(states, deviationThreshold),
+            "Rebalancing not needed"
+        );
+
+        // Get rebalance actions
+        RebalanceLib.RebalanceAction[] memory actions = RebalanceLib.calculateRebalanceActions(
+            states,
+            totalPortfolioValue
+        );
+
+        // Separate into withdrawals and deposits
+        (
+            RebalanceLib.RebalanceAction[] memory deposits,
+            RebalanceLib.RebalanceAction[] memory withdrawals
+        ) = RebalanceLib.separateActions(actions);
+
+        // Execute withdrawals first (to free up capital)
+        for (uint256 i = 0; i < withdrawals.length; i++) {
+            if (withdrawals[i].amount > 0) {
+                IStrategy(withdrawals[i].strategy).withdraw(
+                    withdrawals[i].amount,
+                    address(this)
+                );
+            }
+        }
+
+        // Execute deposits
+        for (uint256 i = 0; i < deposits.length; i++) {
+            if (deposits[i].amount > 0) {
+                IERC20(asset).forceApprove(deposits[i].strategy, deposits[i].amount);
+                IStrategy(deposits[i].strategy).deposit(deposits[i].amount);
+            }
+        }
+
+        lastRebalanceTimestamp = block.timestamp;
+
+        emit Rebalanced(totalPortfolioValue, block.timestamp);
+    }
+
+    /**
+     * @notice Set deviation threshold for rebalancing
+     * @param _threshold New threshold in basis points
+     */
+    function setDeviationThreshold(uint256 _threshold)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        require(_threshold <= 2000, "Threshold too high"); // Max 20%
+        deviationThreshold = _threshold;
+    }
+
+    /**
+     * @notice Set minimum rebalance amount
+     * @param _minAmount New minimum amount
+     */
+    function setMinRebalanceAmount(uint256 _minAmount)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        minRebalanceAmount = _minAmount;
+    }
+
+    // ============ EVENTS ============
+
+    event Rebalanced(uint256 totalValue, uint256 timestamp);
 }
