@@ -352,7 +352,7 @@ contract RebalanceLibTest is Test {
         uint256 value2,
         uint256 target1,
         uint256 target2
-    ) public view {
+    ) public pure {
         // Bound inputs
         value1 = bound(value1, 1e6, 1_000_000e6);
         value2 = bound(value2, 1e6, 1_000_000e6);
