@@ -34,41 +34,68 @@ Future: Crypto, DeFi, RWA, Yield Strategies
 
 ### Prerequisites
 
-- [Foundry](https://book.getfoundry.sh/getting-started/installation)
-- Git
+- **Foundry** - Solidity development framework
+  ```bash
+  curl -L https://foundry.paradigm.xyz | bash
+  foundryup
+  ```
+- **Git** - Version control
+- **Node.js** (optional) - For formatting
 
 ### Installation
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/yourusername/meta-index-protocol
 cd meta-index-protocol
 
-# Install dependencies
+# 2. Install dependencies
 make install
 
-# Copy environment file
-cp .env.example .env
-```
-
-### Build
-
-```bash
+# 3. Build contracts
 make build
+
+# 4. Run tests (should see 135 tests pass)
+make test
 ```
 
-### Test
+### Common Commands
 
 ```bash
-# Run all tests
-make test
+# Development
+make help              # Show all available commands
+make build             # Compile contracts
+make test              # Run all tests (135 tests)
+make test-unit         # Run unit tests only
+make test-integration  # Run integration tests
+make format            # Format Solidity code
+make sizes             # Show contract sizes
 
-# Run specific test suites
+# Quality Assurance
+make coverage          # Generate coverage report
+make gas-report        # Generate gas usage report
+make snapshot          # Create gas baseline
+make snapshot-diff     # Compare gas usage
+
+# Utilities
+make clean             # Clean build artifacts
+```
+
+### Quick Test
+
+```bash
+# Verify your setup
 make test-unit
 
-# Generate gas report
-make gas-report
+# Expected output:
+# Ran 7 test suites: 135 tests passed, 0 failed, 0 skipped
 ```
+
+### Next Steps
+
+- 📖 Read [SETUP.md](./SETUP.md) for detailed setup instructions
+- 🧪 Read [TESTING.md](./TESTING.md) for testing guide
+- 📝 Review [meta_index_spec.md](./meta_index_spec.md) for technical specification
 
 ## Phase 1A Implementation (COMPLETED)
 

@@ -1,20 +1,36 @@
 # Meta Index Protocol - Development Commands
 
-.PHONY: help install build test test-unit test-integration test-fork deploy clean
+.PHONY: help install build test test-unit test-integration test-fork deploy clean format snapshot
 
 help:
-	@echo "Meta Index Protocol - Available Commands:"
-	@echo "  make install          - Install dependencies"
-	@echo "  make build            - Build contracts"
-	@echo "  make test             - Run all tests"
-	@echo "  make test-unit        - Run unit tests only"
-	@echo "  make test-integration - Run integration tests"
-	@echo "  make test-fork        - Run fork tests"
-	@echo "  make coverage         - Generate coverage report"
-	@echo "  make gas-report       - Generate gas usage report"
-	@echo "  make deploy-local     - Deploy to local Anvil"
-	@echo "  make deploy-testnet   - Deploy to Arbitrum Sepolia"
-	@echo "  make clean            - Clean build artifacts"
+	@echo "╔════════════════════════════════════════════════════════════╗"
+	@echo "║         Meta Index Protocol - Available Commands          ║"
+	@echo "╠════════════════════════════════════════════════════════════╣"
+	@echo "║ SETUP                                                      ║"
+	@echo "║  make install          - Install dependencies              ║"
+	@echo "║  make build            - Build contracts                   ║"
+	@echo "║                                                            ║"
+	@echo "║ TESTING                                                    ║"
+	@echo "║  make test             - Run all tests (135 tests)         ║"
+	@echo "║  make test-unit        - Run unit tests only               ║"
+	@echo "║  make test-integration - Run integration tests             ║"
+	@echo "║  make test-fork        - Run fork tests (Phase 1E)         ║"
+	@echo "║  make coverage         - Generate coverage report          ║"
+	@echo "║  make gas-report       - Generate gas usage report         ║"
+	@echo "║                                                            ║"
+	@echo "║ CODE QUALITY                                               ║"
+	@echo "║  make format           - Format Solidity files             ║"
+	@echo "║  make snapshot         - Create gas snapshot               ║"
+	@echo "║  make snapshot-diff    - Compare with previous snapshot    ║"
+	@echo "║                                                            ║"
+	@echo "║ DEPLOYMENT (Phase 1E)                                      ║"
+	@echo "║  make deploy-local     - Deploy to local Anvil             ║"
+	@echo "║  make deploy-testnet   - Deploy to Arbitrum Sepolia        ║"
+	@echo "║                                                            ║"
+	@echo "║ UTILITIES                                                  ║"
+	@echo "║  make clean            - Clean build artifacts             ║"
+	@echo "║  make sizes            - Show contract sizes               ║"
+	@echo "╚════════════════════════════════════════════════════════════╝"
 
 install:
 	forge install OpenZeppelin/openzeppelin-contracts@v5.0.0 --no-commit
@@ -51,3 +67,15 @@ deploy-testnet:
 clean:
 	forge clean
 	rm -rf cache out coverage lcov.info
+
+format:
+	forge fmt
+
+snapshot:
+	forge snapshot
+
+snapshot-diff:
+	forge snapshot --diff
+
+sizes:
+	forge build --sizes
