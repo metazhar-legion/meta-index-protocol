@@ -103,7 +103,7 @@ contract RebalanceLibTest is Test {
 
     // ============ needsRebalancing TESTS ============
 
-    function test_needsRebalancing_false_whenBalanced() public view {
+    function test_needsRebalancing_false_whenBalanced() public pure {
         RebalanceLib.AllocationState[] memory states = new RebalanceLib.AllocationState[](2);
 
         states[0] = RebalanceLib.AllocationState({
@@ -126,7 +126,7 @@ contract RebalanceLibTest is Test {
         assertFalse(needs);
     }
 
-    function test_needsRebalancing_true_whenExceedsThreshold() public view {
+    function test_needsRebalancing_true_whenExceedsThreshold() public pure {
         RebalanceLib.AllocationState[] memory states = new RebalanceLib.AllocationState[](2);
 
         states[0] = RebalanceLib.AllocationState({
@@ -149,7 +149,7 @@ contract RebalanceLibTest is Test {
         assertTrue(needs);
     }
 
-    function test_needsRebalancing_false_withinThreshold() public view {
+    function test_needsRebalancing_false_withinThreshold() public pure {
         RebalanceLib.AllocationState[] memory states = new RebalanceLib.AllocationState[](2);
 
         // 3% deviation, threshold is 5%
@@ -175,7 +175,7 @@ contract RebalanceLibTest is Test {
 
     // ============ calculateRebalanceActions TESTS ============
 
-    function test_calculateRebalanceActions_twoStrategies() public view {
+    function test_calculateRebalanceActions_twoStrategies() public pure {
         RebalanceLib.AllocationState[] memory states = new RebalanceLib.AllocationState[](2);
 
         states[0] = RebalanceLib.AllocationState({
@@ -214,7 +214,7 @@ contract RebalanceLibTest is Test {
         assertEq(actions[1].amount, 2000e6); // Deposit $2000
     }
 
-    function test_calculateRebalanceActions_threeStrategies() public view {
+    function test_calculateRebalanceActions_threeStrategies() public pure {
         RebalanceLib.AllocationState[] memory states = new RebalanceLib.AllocationState[](3);
 
         states[0] = RebalanceLib.AllocationState({
@@ -253,7 +253,7 @@ contract RebalanceLibTest is Test {
 
     // ============ validateAllocations TESTS ============
 
-    function test_validateAllocations_valid() public view {
+    function test_validateAllocations_valid() public pure {
         uint256[] memory allocations = new uint256[](3);
         allocations[0] = 5000; // 50%
         allocations[1] = 3000; // 30%
@@ -263,7 +263,7 @@ contract RebalanceLibTest is Test {
         assertTrue(valid);
     }
 
-    function test_validateAllocations_invalid() public view {
+    function test_validateAllocations_invalid() public pure {
         uint256[] memory allocations = new uint256[](2);
         allocations[0] = 6000; // 60%
         allocations[1] = 5000; // 50% (total = 110%)
@@ -274,7 +274,7 @@ contract RebalanceLibTest is Test {
 
     // ============ calculateTotals TESTS ============
 
-    function test_calculateTotals() public view {
+    function test_calculateTotals() public pure {
         RebalanceLib.RebalanceAction[] memory actions = new RebalanceLib.RebalanceAction[](3);
 
         actions[0] = RebalanceLib.RebalanceAction({
@@ -303,7 +303,7 @@ contract RebalanceLibTest is Test {
 
     // ============ separateActions TESTS ============
 
-    function test_separateActions() public view {
+    function test_separateActions() public pure {
         RebalanceLib.RebalanceAction[] memory actions = new RebalanceLib.RebalanceAction[](4);
 
         actions[0] = RebalanceLib.RebalanceAction({
