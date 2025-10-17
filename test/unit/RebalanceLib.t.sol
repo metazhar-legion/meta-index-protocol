@@ -13,7 +13,7 @@ contract RebalanceLibTest is Test {
 
     // ============ calculateAllocationStates TESTS ============
 
-    function test_calculateAllocationStates_balanced() public view {
+    function test_calculateAllocationStates_balanced() public pure {
         address[] memory strategies = new address[](2);
         strategies[0] = STRATEGY1;
         strategies[1] = STRATEGY2;
@@ -49,7 +49,7 @@ contract RebalanceLibTest is Test {
         assertEq(states[1].deviation, 0);
     }
 
-    function test_calculateAllocationStates_imbalanced() public view {
+    function test_calculateAllocationStates_imbalanced() public pure {
         address[] memory strategies = new address[](2);
         strategies[0] = STRATEGY1;
         strategies[1] = STRATEGY2;
