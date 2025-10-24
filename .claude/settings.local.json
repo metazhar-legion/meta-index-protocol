@@ -6,7 +6,9 @@
       "Bash(forge test:*)",
       "Bash(forge build:*)",
       "Bash(forge clean:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npm create:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

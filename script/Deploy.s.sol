@@ -79,7 +79,7 @@ contract Deploy is Script {
 
         // 4. Deploy MockSwapRouter
         console.log("\n4. Deploying MockSwapRouter...");
-        swapRouter = address(new MockSwapRouter(usdc));
+        swapRouter = address(new MockSwapRouter());
         console.log("   SwapRouter deployed at:", swapRouter);
 
         // 5. Deploy StrategyManager
@@ -114,9 +114,8 @@ contract Deploy is Script {
         strategy1 = address(
             new MockStrategy(
                 vault,
-                usdc,
-                "DeFi Strategy",
-                10 // 10% base APY
+                strategyManager,
+                usdc
             )
         );
         console.log("   Strategy1 (DeFi) deployed at:", strategy1);
@@ -124,9 +123,8 @@ contract Deploy is Script {
         strategy2 = address(
             new MockStrategy(
                 vault,
-                usdc,
-                "Yield Strategy",
-                15 // 15% base APY
+                strategyManager,
+                usdc
             )
         );
         console.log("   Strategy2 (Yield) deployed at:", strategy2);
