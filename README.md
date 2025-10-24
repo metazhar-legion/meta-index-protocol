@@ -14,7 +14,9 @@ Meta Index Protocol enables users to gain diversified exposure to crypto, DeFi, 
 
 **Phase 1D Status:** ✅ COMPLETED - Portfolio rebalancing with DEX integration (MVP)
 
-**Current Deployment:** Local development
+**Phase F Status:** ✅ COMPLETED - React frontend with wallet integration and full UI
+
+**Current Deployment:** Local development with frontend interface
 
 ## Architecture
 
@@ -39,13 +41,47 @@ Future: Crypto, DeFi, RWA, Yield Strategies
   curl -L https://foundry.paradigm.xyz | bash
   foundryup
   ```
+- **Node.js 18+** - For frontend development
 - **Git** - Version control
-- **Node.js** (optional) - For formatting
 
-### Installation
+### Full Stack Setup (Contracts + Frontend)
 
 ```bash
 # 1. Clone the repository
+git clone https://github.com/yourusername/meta-index-protocol
+cd meta-index-protocol
+
+# 2. Install contract dependencies
+make install
+
+# 3. Build contracts
+make build
+
+# 4. Run tests (should see 135 tests pass)
+make test
+
+# 5. Start local blockchain (in a separate terminal)
+anvil
+
+# 6. Deploy contracts
+forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+# 7. Setup frontend
+cd frontend
+npm install
+npm run generate-abis
+npm run update-addresses
+
+# 8. Start frontend
+npm run dev:anvil
+
+# Visit http://localhost:5173 and connect your wallet!
+```
+
+### Contracts Only
+
+```bash
+# 1. Clone and setup
 git clone https://github.com/yourusername/meta-index-protocol
 cd meta-index-protocol
 
@@ -55,7 +91,7 @@ make install
 # 3. Build contracts
 make build
 
-# 4. Run tests (should see 135 tests pass)
+# 4. Run tests
 make test
 ```
 
@@ -289,13 +325,32 @@ Phase 1D has been successfully completed with:
 - ✅ MockSwapRouter for testing
 - ✅ Comprehensive unit and integration tests (30 new tests)
 
-## Next Steps - Phase 1E (Week 5-6)
+## Phase F Completion (Frontend Integration)
 
-- [ ] Full integration testing suite
-- [ ] Fork tests against Arbitrum testnet
-- [ ] Deployment scripts for testnet
-- [ ] Contract verification scripts
-- [ ] Documentation for testnet deployment
+Phase F has been successfully completed with:
+- ✅ **React 19 + TypeScript** frontend with Vite
+- ✅ **Web3 Integration** with Wagmi v2 and Viem
+- ✅ **Wallet Connection** (MetaMask, WalletConnect)
+- ✅ **Vault Dashboard** with deposit/withdraw flows
+- ✅ **Strategy Visualization** showing allocations
+- ✅ **Custom React Hooks** for contract interactions
+- ✅ **ABI Generation Scripts** from Foundry artifacts
+- ✅ **Address Management** with auto-sync from deployments
+- ✅ **Deployment Script** (`script/Deploy.s.sol`) for full stack
+- ✅ **Comprehensive Documentation** (PHASE_F_GUIDE.md)
+- ✅ **Development Workflow** with hot reload and auto-updates
+
+**Get Started**: See [PHASE_F_GUIDE.md](./PHASE_F_GUIDE.md) for complete setup instructions.
+
+**Frontend Location**: `frontend/` directory with full source code.
+
+## Next Steps - Phase G (DAO Governance)
+
+- [ ] On-chain proposal creation and voting
+- [ ] Governance token implementation
+- [ ] Timelock for proposal execution
+- [ ] Role-based access control in contracts
+- [ ] DAO dashboard in frontend
 
 ## Security
 
