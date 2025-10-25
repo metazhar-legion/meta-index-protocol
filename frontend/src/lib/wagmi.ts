@@ -1,9 +1,6 @@
 import { http, createConfig } from 'wagmi';
 import { mainnet, arbitrum, arbitrumSepolia, base, baseSepolia, localhost } from 'wagmi/chains';
-import { injected, walletConnect } from 'wagmi/connectors';
-
-// Get WalletConnect project ID from environment
-const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '';
+import { injected } from 'wagmi/connectors';
 
 // Define the chains we support
 export const chains = [localhost, arbitrumSepolia, arbitrum, baseSepolia, base, mainnet] as const;
@@ -12,11 +9,7 @@ export const chains = [localhost, arbitrumSepolia, arbitrum, baseSepolia, base, 
 export const config = createConfig({
   chains,
   connectors: [
-    injected(),
-    walletConnect({
-      projectId,
-      showQrModal: true,
-    }),
+    injected({ target: 'metaMask' }),
   ],
   transports: {
     [localhost.id]: http('http://127.0.0.1:8545'),
