@@ -5,6 +5,13 @@ export function ConnectWallet() {
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
 
+  // Debug logging
+  console.log('ConnectWallet render:', { 
+    isConnected, 
+    address, 
+    connectors: connectors.map(c => ({ id: c.id, name: c.name, ready: c.ready }))
+  })
+
   if (isConnected && address) {
     return (
       <div className="flex items-center gap-3">
@@ -29,8 +36,10 @@ export function ConnectWallet() {
       {connectors.map((connector) => (
         <button
           key={connector.id}
-          onClick={() => connect({ connector })}
-          disabled={!connector.ready}
+          onClick={() => {
+            console.log('Connecting with connector:', connector)
+            connect({ connector })
+          }}
           className="px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors"
         >
           Connect Wallet
